@@ -4,8 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.coroutines.*
-import me.ryanpierce.trialanimations.Meteor.Companion.addMeteors
-import java.lang.ProcessBuilder.Redirect.to
+import me.ryanpierce.trialanimations.Meteor.Factory.Companion.addMeteors
 
 // GOAL OF METEOR
 // The idea is that meteor is something you can use to visualize the mechanics
@@ -29,12 +28,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val origin = 60f x 200f
 
 
-        // Meteors
-        val meteors = listOf(
-            Meteor(origin, this, this, "1"),
-            Meteor(origin, this, this, "2")
-        )
-        layout.addMeteors(meteors)
+
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
+
 
         val channel = MeteorChannel()
         val fanOutChannel = MeteorChannel()

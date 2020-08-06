@@ -3,22 +3,14 @@ package me.ryanpierce.trialanimations
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.drawable.Drawable
+import android.graphics.Typeface
+import android.graphics.Typeface.DEFAULT_BOLD
+import android.view.Gravity
+import android.view.Gravity.CENTER
 import android.view.ViewGroup
-import android.view.animation.AnimationSet
-import android.view.animation.TranslateAnimation
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
-import androidx.core.view.marginLeft
-import androidx.core.view.setPadding
-import androidx.core.view.updatePadding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
-import kotlinx.coroutines.flow.Flow
 
 // Call the whole project Meteor, just like how Wharton does random single namer's
 // History: was looking for animator too, but they were all to hard to use and
@@ -35,16 +27,19 @@ class Meteor(
     start: Coordinate?,
     scope: CoroutineScope,
     context: Context,
-    label: String
-) : AppCompatImageView(context) {
+    val index: Int
+) : AppCompatTextView(context) {
 
     init {
         start?.run {
             x = first
             y = second
         }
-        setImageResource(R.drawable.circle)
-        setPadding(10, 10, 10, 10)
+        setBackgroundResource(R.drawable.circle)
+        text = index.toString()
+        typeface = DEFAULT_BOLD
+        gravity = CENTER
+        textSize = 20f
     }
 
     val actor = scope.actor<Coordinate> {
@@ -53,21 +48,32 @@ class Meteor(
         }
     }
 
-    companion object {
-        fun ViewGroup.addMeteors(meteors: List<Meteor>) = meteors.forEachIndexed { index, meteor ->
-            addView(meteor)
-            meteor.setPadding(index * 120 + 10, 10, 10, 10)
-        }
-    }
-
     fun animateTransition(coordinate: Coordinate) {
+        val shiftedXCoordinate = coordinate.first + index * 120
         AnimatorSet().apply {
             playTogether(
-                ObjectAnimator.ofFloat(this@Meteor, "translationX", x, coordinate.first),
+                ObjectAnimator.ofFloat(this@Meteor, "translationX", x, shiftedXCoordinate),
                 ObjectAnimator.ofFloat(this@Meteor, "translationY", y, coordinate.second)
             )
             duration = 1000
             start()
+        }
+    }
+
+    data class Factory(
+        val start: Coordinate,
+        val coroutineScope: CoroutineScope,
+        val layout: ViewGroup,
+        val context: Context
+    ) {
+        companion object {
+
+            fun Factory.addMeteors(count: Int) = (0..count-1).map { index ->
+                Meteor(start, coroutineScope, context, index).apply {
+                    this@addMeteors.layout.addView(this)
+                    x += index * 120
+                }
+            }
         }
     }
 }
