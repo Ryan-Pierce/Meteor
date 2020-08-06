@@ -13,9 +13,9 @@ class MeteorChannel {
         channel.send(meteor)
     }
 
-    suspend fun receive(meteorCoroutine: MeteorCoroutine): Meteor {
+    suspend fun receive(coordinate: Coordinate): Meteor {
         val meteor = channel.receive()
-        meteor.actor.send(meteorCoroutine.location)
+        meteor.actor.send(coordinate)
         return meteor
     }
 }

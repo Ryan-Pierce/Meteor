@@ -5,8 +5,7 @@ import android.os.Bundle
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.coroutines.*
 import me.ryanpierce.trialanimations.Meteor.Companion.addMeteors
-import me.ryanpierce.trialanimations.MeteorCoroutine.Companion.addCoroutines
-import me.ryanpierce.trialanimations.MeteorCoroutine.Companion.start
+import java.lang.ProcessBuilder.Redirect.to
 
 // GOAL OF METEOR
 // The idea is that meteor is something you can use to visualize the mechanics
@@ -26,13 +25,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     override fun onStart() {
         super.onStart()
 
-        // Locations
-        val origin = (60f to 200f)
-        val coroutine1 = origin
-        val coroutine2 = (400f to 500f)
-        val coroutine3 = (200f to 900f)
-        val coroutine4 = (600f to 900f)
-        val coroutine5 = (400f to 1200f)
+
+        val origin = 60f x 200f
+
 
         // Meteors
         val meteors = listOf(
@@ -41,40 +36,43 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         )
         layout.addMeteors(meteors)
 
-        // Coroutines
         val channel = MeteorChannel()
         val fanOutChannel = MeteorChannel()
         val fanInChannel = MeteorChannel()
-        val coroutines = listOf(
-            MeteorCoroutine(coroutine1, this, this) {
-                meteors.forEach { channel.send(it) }
-            },
-            MeteorCoroutine(coroutine2, this, this) { meteorCoroutine ->
-                meteors.forEach {
-                    val meteor = channel.receive(meteorCoroutine)
-                    fanOutChannel.send(meteor)
-                }
-            },
-            MeteorCoroutine(coroutine3, this, this) { meteorCoroutine ->
-                meteors.forEach {
-                    val meteor = fanOutChannel.receive(meteorCoroutine)
-                    fanInChannel.send(meteor)
-                }
-            },
-            MeteorCoroutine(coroutine4, this, this) { meteorCoroutine ->
-                meteors.forEach {
-                    val meteor = fanOutChannel.receive(meteorCoroutine)
-                    fanInChannel.send(meteor)
-                }
-            },
-            MeteorCoroutine(coroutine5, this, this) { meteorCoroutine ->
-                meteors.forEach {
-                    fanInChannel.receive(meteorCoroutine)
-                }
+
+        val config = MeteorCoroutineScope.Config(layout, this)
+        val scope = MeteorCoroutineScope(this, config)
+
+        scope.launch(origin, "Start") {
+            meteors.forEach { channel.send(it) }
+        }
+
+        scope.launch(400f x 500f, "Fan Out") { location ->
+            meteors.forEach {
+                val meteor = channel.receive(location)
+                fanOutChannel.send(meteor)
             }
-        )
-        layout.addCoroutines(coroutines)
-        coroutines.start()
+        }
+
+        scope.launch(200f x 900f, "Worker") { location ->
+            meteors.forEach {
+                val meteor = fanOutChannel.receive(location)
+                fanInChannel.send(meteor)
+            }
+        }
+
+        scope.launch(600f x 900f) { location ->
+            meteors.forEach {
+                val meteor = fanOutChannel.receive(location)
+                fanInChannel.send(meteor)
+            }
+        }
+
+        scope.launch(400f x 1200f, "End") { location ->
+            meteors.forEach {
+                fanInChannel.receive(location)
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -82,3 +80,5 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         cancel()
     }
 }
+
+infix fun Float.x(that: Float) = this to that
