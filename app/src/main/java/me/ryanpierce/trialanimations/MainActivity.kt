@@ -1,9 +1,13 @@
 package me.ryanpierce.trialanimations
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import me.ryanpierce.trialanimations.Meteor.Factory.Companion.addMeteors
 
 // GOAL OF METEOR
@@ -24,11 +28,29 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     override fun onStart() {
         super.onStart()
 
+        // Choose the demo you'd like to see from the strings in this when statement
+        when ("flowDemo") {
+            "flowDemo" -> flowDemo()
+            "workerPool" -> workerPoolDemo()
+        }
+    }
 
+    fun flowDemo() {
         val origin = 60f x 200f
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(2)
 
+        val config = MeteorCoroutineScope.Config(layout, this)
+        val scope = MeteorCoroutineScope(this, config)
 
+        scope.launch(400f x 500f, "Start") { location ->
+            meteors.asFlow().collect(location) { meteor ->
+                meteor.setBackgroundResource(R.drawable.blue_circle)
+            }
+        }
+    }
 
+    fun workerPoolDemo() {
+        val origin = 60f x 200f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
 

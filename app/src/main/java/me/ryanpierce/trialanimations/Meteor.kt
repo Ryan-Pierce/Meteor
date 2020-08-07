@@ -3,9 +3,7 @@ package me.ryanpierce.trialanimations
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.graphics.Typeface
 import android.graphics.Typeface.DEFAULT_BOLD
-import android.view.Gravity
 import android.view.Gravity.CENTER
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
@@ -35,7 +33,7 @@ class Meteor(
             x = first
             y = second
         }
-        setBackgroundResource(R.drawable.circle)
+        setBackgroundResource(R.drawable.green_circle)
         text = index.toString()
         typeface = DEFAULT_BOLD
         gravity = CENTER
