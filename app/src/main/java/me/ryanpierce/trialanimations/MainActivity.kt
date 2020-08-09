@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
     fun stateFlowDemo() {
         val origin = 60f x 200f
-        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(2)
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
         val mutableStateFlow = MeteorMutableStateFlow(meteors.first(), layout)
         val stateFlow = MeteorStateFlow(mutableStateFlow)
@@ -55,7 +55,13 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             }
         }
 
-        mutableStateFlow.value = meteors.component2()
+        // Regular coroutine
+        launch {
+            meteors.forEach { meteor ->
+                delay(1500)
+                mutableStateFlow.value = meteor
+            }
+        }
     }
 
     fun flowDemo() {
