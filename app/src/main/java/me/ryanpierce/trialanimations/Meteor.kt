@@ -21,10 +21,10 @@ import kotlinx.coroutines.channels.actor
 
 typealias Coordinate = Pair<Float,Float>
 
-class Meteor(
-    start: Coordinate?,
-    scope: CoroutineScope,
-    context: Context,
+data class Meteor(
+    val start: Coordinate?,
+    val scope: CoroutineScope,
+    @get:JvmName("getContext_") val context: Context,
     val index: Int
 ) : AppCompatTextView(context) {
 

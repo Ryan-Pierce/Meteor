@@ -1,13 +1,10 @@
 package me.ryanpierce.trialanimations
 
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import me.ryanpierce.trialanimations.Meteor.Factory.Companion.addMeteors
 
 // GOAL OF METEOR
@@ -29,10 +26,36 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         super.onStart()
 
         // Choose the demo you'd like to see from the strings in this when statement
-        when ("flowDemo") {
+        when ("stateFlowDemo") {
+            "stateFlowDemo" -> stateFlowDemo()
             "flowDemo" -> flowDemo()
             "workerPool" -> workerPoolDemo()
         }
+    }
+
+    fun stateFlowDemo() {
+        val origin = 60f x 200f
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(2)
+
+        val mutableStateFlow = MeteorMutableStateFlow(meteors.first(), layout)
+        val stateFlow = MeteorStateFlow(mutableStateFlow)
+
+        val config = MeteorCoroutineScope.Config(layout, this)
+        val scope = MeteorCoroutineScope(this, config)
+
+        scope.launch(400f x 500f, "one") { location ->
+            stateFlow.collect(location) { meteor ->
+                meteor.setBackgroundResource(R.drawable.blue_circle)
+            }
+        }
+
+        scope.launch(400f x 900f, "two") { location ->
+            stateFlow.collect(location) { meteor ->
+                meteor.setBackgroundResource(R.drawable.blue_circle)
+            }
+        }
+
+        mutableStateFlow.value = meteors.component2()
     }
 
     fun flowDemo() {
