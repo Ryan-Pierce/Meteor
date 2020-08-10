@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
         scope.launch(400f x 500f, "one") { location ->
             stateFlow.collect(location) { meteor ->
+                delay(7000)
                 meteor.setBackgroundResource(R.drawable.blue_circle)
             }
         }

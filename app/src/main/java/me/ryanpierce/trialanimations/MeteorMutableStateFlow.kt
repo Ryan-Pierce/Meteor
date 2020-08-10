@@ -16,7 +16,7 @@ class MeteorMutableStateFlow(initialValue: Meteor, val layout: ViewGroup) {
         }
 
     @OptIn(kotlinx.coroutines.InternalCoroutinesApi::class)
-    suspend fun collect(location: Coordinate, block: (Meteor) -> Unit) {
+    suspend fun collect(location: Coordinate, block: suspend (Meteor) -> Unit) {
         mutableStateFlow.collect(
             object : FlowCollector<Meteor> {
                 override suspend fun emit(value: Meteor) {
