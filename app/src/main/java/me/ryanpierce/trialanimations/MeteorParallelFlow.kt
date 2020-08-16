@@ -27,8 +27,7 @@ data class MeteorParallelFlow(
             val workerLocation = coordinate.first + (count * 300) x coordinate.second + 300
             scope.launch(workerLocation, "Worker $count") { location ->
                 sendChannel.forEach(location) { meteor ->
-                    delay(1000) // Important, allows meteors to linger in the Worker coroutines which
-                    // actually shows the parallelism by demostrating parallel processing
+                    delay(1000) // Allows meteors to linger, demonstrating parallelism
                     receiveChannel.send(transform(meteor))
                 }
             }
