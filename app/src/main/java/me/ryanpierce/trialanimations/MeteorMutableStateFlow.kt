@@ -25,7 +25,6 @@ class MeteorMutableStateFlow(initialValue: Meteor, val layout: ViewGroup) {
                         x += index * 120
                     }
                     copiedMeteor.actor.send(location)
-                    delay(1000)
                     block(copiedMeteor)
                 }
             }

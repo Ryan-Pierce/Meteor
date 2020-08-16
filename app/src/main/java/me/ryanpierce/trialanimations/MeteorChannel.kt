@@ -18,4 +18,10 @@ class MeteorChannel {
         meteor.actor.send(coordinate)
         return meteor
     }
+
+    suspend fun forEach(coordinate: Coordinate, block: suspend (Meteor) -> Unit ) {
+        while (!channel.isClosedForReceive) {
+            block(receive(coordinate))
+        }
+    }
 }

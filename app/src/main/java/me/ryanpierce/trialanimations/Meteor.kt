@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.delay
 
 // Call the whole project Meteor, just like how Wharton does random single namer's
 // History: was looking for animator too, but they were all to hard to use and
@@ -28,6 +29,10 @@ data class Meteor(
     val index: Int
 ) : AppCompatTextView(context) {
 
+    companion object {
+        const val ANIMATION_DURATION = 1_000L
+    }
+
     init {
         start?.run {
             x = first
@@ -43,6 +48,7 @@ data class Meteor(
     val actor = scope.actor<Coordinate> {
         for (coordinate in channel) {
             animateTransition(coordinate)
+            delay(ANIMATION_DURATION)
         }
     }
 
@@ -53,9 +59,14 @@ data class Meteor(
                 ObjectAnimator.ofFloat(this@Meteor, "translationX", x, shiftedXCoordinate),
                 ObjectAnimator.ofFloat(this@Meteor, "translationY", y, coordinate.second)
             )
-            duration = 1000
+            duration = ANIMATION_DURATION
             start()
         }
+    }
+
+    suspend fun landAsMeteorite() {
+        delay(ANIMATION_DURATION)
+        setBackgroundResource(R.drawable.blue_circle)
     }
 
     data class Factory(
