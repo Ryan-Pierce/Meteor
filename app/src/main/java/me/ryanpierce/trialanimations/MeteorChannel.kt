@@ -19,6 +19,8 @@ class MeteorChannel {
         return meteor
     }
 
+    // This replaces ChannelIterator (I tried implementing a true ChannelIterator but
+    // ran into several issues)
     suspend fun forEach(coordinate: Coordinate, block: suspend (Meteor) -> Unit ) {
         while (!channel.isClosedForReceive) {
             block(receive(coordinate))

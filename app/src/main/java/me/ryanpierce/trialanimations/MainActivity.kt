@@ -9,9 +9,9 @@ import me.ryanpierce.trialanimations.Meteor.Factory.Companion.addMeteors
 import me.ryanpierce.trialanimations.Demo.*
 
 // GOAL OF METEOR
-// The idea is that meteor is something you can use to visualize the mechanics
+// Meteor visualizes the mechanics
 //  of your flows. Specifically, you can send meteors into your flows and the
-//  app will visualize the meteors moving through the machinery
+//  app will visualize the meteors moving through the machinery.
 
 class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         super.onStart()
 
         // Choose the demo you'd like to see from the strings in this when statement
-        when (STATE_FLOW_DEMO) {
+        when (PARALLEL_FLOW_DEMO) {
             PARALLEL_FLOW_DEMO -> parallelFlowDemo()
             SHARED_FLOW_DEMO -> sharedFlowDemo()
             STATE_FLOW_DEMO -> stateFlowDemo()
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
     fun parallelFlowDemo() {
         val origin = 10f x 100f
-        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(6)
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)

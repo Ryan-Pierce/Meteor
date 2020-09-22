@@ -44,6 +44,29 @@ data class MeteorParallelFlow(
     }
 }
 
+/**
+ * The parallel contract might look something like this
+ *
+ *   someFlow
+ *       .parallel { T
+ *           val result: R = transform(T)
+ *           result
+ *       }
+ *       .moreOperatorsNotInParallel { R -> //... }
+ *
+ *  Tricky questions:
+ *  -Should order be maintained? If so, should it be an option so
+ *      that dev's can decline maintaining order to boost performance.
+ *  -How is the concurrency count determined? ideally this value is dyamically
+ *      calculated and throttled based on the hardware and available resources.
+ *  -Compare the behavior of this and under-the-hood implementation to the
+ *  Flow.flatMapMerge() operator. (flatMapMerge is bascially the channelFlow {} idea vs.
+ *  a pool of coroutines that never cancel and are fed by a fan-out channel.) My pool
+ *  is more reactive (since it stays alive until the lifecycle and thus coroutinescope is cancelled)
+ *  and spends less time spinning up new coroutines and is less wasteful
+ *  with coroutines by reusing the existing pool.
+ */
+
 fun Flow<Meteor>.parallel(
     meteorCoroutineScope: MeteorCoroutineScope,
     concurrency: Int = 3,
