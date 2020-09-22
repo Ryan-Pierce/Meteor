@@ -17,7 +17,7 @@ data class MeteorParallelFlow(
         val sendChannel = MeteorChannel()
         val receiveChannel = MeteorChannel()
 
-        scope.launch(coordinate.first x coordinate.second + 600) { location ->
+        scope.launch(coordinate.first x coordinate.second + 600, "Destination") { location ->
             receiveChannel.forEach(location) { meteor ->
                 block(meteor)
             }

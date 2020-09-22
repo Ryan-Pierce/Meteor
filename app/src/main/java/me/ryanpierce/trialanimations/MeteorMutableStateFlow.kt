@@ -1,11 +1,10 @@
 package me.ryanpierce.trialanimations
 
 import android.view.ViewGroup
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class MeteorMutableStateFlow(initialValue: Meteor, val layout: ViewGroup) {
+class MeteorMutableStateFlow(val layout: ViewGroup, initialValue: Meteor) {
 
     private val mutableStateFlow = MutableStateFlow(initialValue)
 

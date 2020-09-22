@@ -4,9 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageView
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -30,7 +28,7 @@ class MeteorCoroutineScope(
                     y = second
                 }
                 layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-                text = name
+                text = " $name"
                 setBackgroundResource(R.drawable.square)
                 config.layout.addView(this)
             }

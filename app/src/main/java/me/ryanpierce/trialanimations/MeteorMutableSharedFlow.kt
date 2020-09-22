@@ -1,37 +1,34 @@
 package me.ryanpierce.trialanimations
 
 import android.view.ViewGroup
-import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.MutableSharedFlow
 
-class MeteorMutableSharedFlow(initialValue: Meteor, val layout: ViewGroup) {
+class MeteorMutableSharedFlow(
+    val layout: ViewGroup,
+    replay: Int,
+    extraBufferCapacity: Int = 0,
+    onBufferOverflow: BufferOverflow = BufferOverflow.SUSPEND
+) {
 
-    private val mutableSharedFlow = MutableStateFlow(initialValue)
+    private val mutableSharedFlow = MutableSharedFlow<Meteor>(replay, extraBufferCapacity, onBufferOverflow)
 
-    var value
-        get() = mutableSharedFlow.value
-        set(value) {
-            mutableSharedFlow.value = value
-        }
+    suspend fun emit(meteor: Meteor) = mutableSharedFlow.emit(meteor)
 
     @OptIn(kotlinx.coroutines.InternalCoroutinesApi::class)
     suspend fun collect(location: Coordinate, block: suspend (Meteor) -> Unit) {
-        mutableSharedFlow
-            .buffer(UNLIMITED)
-            .collect(
-                object : FlowCollector<Meteor> {
-                    override suspend fun emit(value: Meteor) {
-                        val copiedMeteor = value.copy().apply {
-                            this@MeteorMutableSharedFlow.layout.addView(this)
-                            x += index * 120
-                        }
-                        copiedMeteor.actor.send(location)
-                        block(copiedMeteor)
+        mutableSharedFlow.collect(
+            object : FlowCollector<Meteor> {
+                override suspend fun emit(value: Meteor) {
+                    val copiedMeteor = value.copy().apply {
+                        this@MeteorMutableSharedFlow.layout.addView(this)
+                        x += index * 120
                     }
+                    copiedMeteor.actor.send(location)
+                    block(copiedMeteor)
                 }
+            }
         )
     }
 }

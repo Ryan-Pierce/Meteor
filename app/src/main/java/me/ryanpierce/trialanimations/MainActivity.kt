@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val origin = 60f x 200f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
-        val mutableSharedFlow = MeteorMutableSharedFlow(meteors.first(), layout)
-        val sharedFlow = MeteorSharedFlow(mutableSharedFlow)
+        val mutableSharedFlow = MeteorMutableSharedFlow(layout, 0)
+        val sharedFlow = MeteorSharedFlow(mutableSharedFlow) // TODO make similiar to SharedFlow contract
 
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         launch {
             meteors.forEach { meteor ->
                 delay(1500)
-                mutableSharedFlow.value = meteor
+                mutableSharedFlow.emit(meteor)
             }
         }
     }
@@ -89,8 +89,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val origin = 60f x 200f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
-        val mutableStateFlow = MeteorMutableStateFlow(meteors.first(), layout)
-        val stateFlow = MeteorStateFlow(mutableStateFlow)
+        val mutableStateFlow = MeteorMutableStateFlow(layout, meteors.first())
+        val stateFlow = MeteorStateFlow(mutableStateFlow) // TODO make similiar to StateFlow contract
 
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)
@@ -119,14 +119,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
     fun flowDemo() {
         val origin = 60f x 200f
-        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(2)
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)
 
         scope.launch(400f x 500f, "Start") { location ->
             meteors.asFlow().collect(location) { meteor ->
-                meteor.setBackgroundResource(R.drawable.blue_circle)
+                meteor.setBackgroundResource(R.drawable.green_circle)
             }
         }
     }
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val origin = 60f x 200f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
-
+        // TODO show channels as lines
         val channel = MeteorChannel()
         val fanOutChannel = MeteorChannel()
         val fanInChannel = MeteorChannel()
