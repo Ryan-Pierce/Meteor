@@ -37,13 +37,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     }
 
     fun parallelFlowDemo() {
-        val origin = 10f x 100f
+        val origin = 280f x 100f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)
 
-        scope.launch(80f x 200f, "Start") { location ->
+        scope.launch(375f x 300f) { location ->
+            delay(1000)
             meteors
                 .asFlow()
                 .parallel(scope)
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
     }
 
     fun sharedFlowDemo() {
-        val origin = 60f x 200f
+        val origin = 200f x 200f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
         val mutableSharedFlow = MeteorMutableSharedFlow(layout, 0)
@@ -63,30 +64,30 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)
 
-        scope.launch(400f x 500f, "one") { location ->
+        scope.launch(100f x 400f, "Fast") { location ->
             sharedFlow.collect(location) { meteor ->
                 meteor.landAsMeteorite()
-                delay(3000) // Making it a slow collector
             }
         }
 
-        scope.launch(400f x 900f, "two") { location ->
+        scope.launch(500f x 400f, "Slow") { location ->
             sharedFlow.collect(location) { meteor ->
                 meteor.landAsMeteorite()
+                delay(1300) // Making it a slow collector
             }
         }
 
         // Regular coroutine
         launch {
             meteors.forEach { meteor ->
-                delay(1500)
+                delay(900)
                 mutableSharedFlow.emit(meteor)
             }
         }
     }
 
     fun stateFlowDemo() {
-        val origin = 60f x 200f
+        val origin = 200f x 200f
         val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
 
         val mutableStateFlow = MeteorMutableStateFlow(layout, meteors.first())
@@ -95,14 +96,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         val config = MeteorCoroutineScope.Config(layout, this)
         val scope = MeteorCoroutineScope(this, config)
 
-        scope.launch(400f x 500f, "one") { location ->
+        scope.launch(500f x 400f, "Slow") { location ->
             stateFlow.collect(location) { meteor ->
                 meteor.landAsMeteorite()
-                delay(4000) // Making it a slow collector
+                delay(1500) // Making it a slow collector
             }
         }
 
-        scope.launch(400f x 900f, "two") { location ->
+        scope.launch(100f x 400f, "Fast") { location ->
             stateFlow.collect(location) { meteor ->
                 meteor.landAsMeteorite()
             }
@@ -111,21 +112,21 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         // Regular coroutine
         launch {
             meteors.forEach { meteor ->
-                delay(1500)
+                delay(1000)
                 mutableStateFlow.value = meteor
             }
         }
     }
 
     fun flowDemo() {
-        val origin = 60f x 200f
-        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4)
+        val origin = 300f x 300f
+        val meteors = Meteor.Factory(origin, this, layout, this).addMeteors(4).asFlow()
 
         val config = MeteorCoroutineScope.Config(layout, this)
-        val scope = MeteorCoroutineScope(this, config)
+        val coroutineScope = MeteorCoroutineScope(this, config)
 
-        scope.launch(400f x 500f, "Start") { location ->
-            meteors.asFlow().collect(location) { meteor ->
+        coroutineScope.launch { location ->
+            meteors.collect(location) { meteor ->
                 meteor.setBackgroundResource(R.drawable.green_circle)
             }
         }
@@ -153,14 +154,14 @@ class MainActivity : AppCompatActivity(), CoroutineScope by MainScope() {
             }
         }
 
-        scope.launch(200f x 900f, "Worker") { location ->
+        scope.launch(200f x 850f, "Worker 1") { location ->
             fanOutChannel.forEach(location) { meteor ->
                 delay(1000)
                 fanInChannel.send(meteor)
             }
         }
 
-        scope.launch(600f x 900f) { location ->
+        scope.launch(600f x 850f, "Worker 2") { location ->
             fanOutChannel.forEach(location) { meteor ->
                 delay(1000)
                 fanInChannel.send(meteor)

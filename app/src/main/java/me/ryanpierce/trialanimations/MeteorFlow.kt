@@ -5,14 +5,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 @OptIn(kotlinx.coroutines.InternalCoroutinesApi::class)
-suspend fun Flow<Meteor>.collect(location: Coordinate, block: (Meteor) -> Unit) {
-    collect(
-        object : FlowCollector<Meteor> {
-            override suspend fun emit(value: Meteor) {
-                value.actor.send(location)
-                delay(1000)
-                block(value)
-            }
-        }
-    )
+suspend fun Flow<Meteor>.collect(location: Coordinate, block: (Meteor) -> Unit) = collect { meteor ->
+    meteor.actor.send(location)
+    delay(1000)
+    block(meteor)
 }

@@ -15,7 +15,7 @@ class MeteorCoroutineScope(
 ) : CoroutineScope by coroutineScope {
 
     fun launch(
-        location: Coordinate,
+        location: Coordinate = 400f x 500f,
         name: String = "",
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,

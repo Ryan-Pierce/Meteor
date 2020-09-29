@@ -12,15 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.delay
 
-// Call the whole project Meteor, just like how Wharton does random single namer's
-// History: was looking for animator too, but they were all to hard to use and
-// didn't even accomplish what I wanted without lots of work or an enterprise subscription.
-// Decided, maybe i'll just animate straight in android. It felt like a joke at first, but then
-// i realized, If i could bind it to the code, it would become a visualization-debugging tool.
-
-// Note to self: If you keep this simple, you may be able to open-source this in time for
-// the speech.
-
 typealias Coordinate = Pair<Float,Float>
 
 data class Meteor(
@@ -69,7 +60,7 @@ data class Meteor(
     fun Coordinate.adjusted(index: Int): Coordinate {
         val X = if (index % 2 == 0) first else first + 120
         val Y = second + (index / 2 * 120)
-        return X+15 x Y+30
+        return X+25 x Y+30
     }
 
     suspend fun landAsMeteorite() {
